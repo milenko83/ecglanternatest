@@ -41,11 +41,9 @@
         border: 1px solid rgba(48,79,158,0.06);
     }
 
-    /* HEADER & LOGO */
     .hero{ padding: 25px 28px 10px; background: white; text-align: center; }
     .logo{ width: 240px; height: auto; display: block; margin: 0 auto; }
 
-    /* ELEGANT CHECK-IN TAB */
     .checkin-container {
         display: flex;
         justify-content: center;
@@ -66,7 +64,6 @@
     .checkin-tag strong { color: var(--ecg-blue-dark); font-weight: 700; letter-spacing: 0.5px; }
     .dot { height: 6px; width: 6px; background: var(--ecg-orange-light); border-radius: 50%; }
 
-    /* CONTROLS */
     .controls{
         padding: 20px 28px;
         display: flex;
@@ -97,7 +94,6 @@
         background: white url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23304f9e' stroke-width='2'><polyline points='6 9 12 15 18 9'></polyline></svg>") no-repeat right 12px center;
     }
 
-    /* GRADIENT BUTTONS */
     .nav-btn{
         height: 44px;
         padding: 0 22px;
@@ -125,7 +121,6 @@
 
     .nav-btn:hover{ opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
 
-    /* MAP SECTION */
     .map-section{ padding: 20px 28px; background: #fbfcff; position: relative; }
     #map{ width: 100%; height: 350px; border-radius: 24px; border: 1px solid #dfe6f2; z-index: 1; }
     
@@ -175,7 +170,6 @@
         font-size: 14px;
     }
 
-    /* BISTRO TILE */
     .bistro-section{ padding: 30px 28px; background: white; border-top: 1px solid var(--border); }
     .bistro-card{
         max-width: 450px;
@@ -266,7 +260,8 @@
 </div>
 
 <script>
-    const BISTRO_COORDS = [45.3031, 13.5936];
+    // Updated coordinates for Bistro & Bakery Shop Lanterna
+    const BISTRO_COORDS = [45.2975803, 13.5860445];
 
     function updateBistroGreeting() {
         const hour = new Date().getHours();
