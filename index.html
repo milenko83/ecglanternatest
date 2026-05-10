@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ECG Lanterna Navigator</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<style>
+    :root{
+        --ecg-blue-dark: #2a448a;
+        --ecg-blue-light: #3d59ab;
+        --ecg-orange-dark: #e89b00;
+        --ecg-orange-light: #fbb016;
+        --bg: #f7f8fc;
+        --card: #ffffff;
+        --text: #24324a;
+        --muted: #6b7280;
+        --border: #e7eaf3;
+        --shadow: 0 12px 35px rgba(25,35,80,0.08);
+    }
+
+    *{ margin:0; padding:0; box-sizing:border-box; font-family:Inter,sans-serif; }
+
+    body{
+        background: linear-gradient(to bottom, #f5f7fb, #eef2f8);
+        min-height: 100vh;
+        padding: 20px;
+        color: var(--text);
+    }
+
+    .app-container{
+        max-width: 1050px;
+        margin: auto;
+        background: var(--card);
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(48,79,158,0.06);
+    }
+
+    /* HEADER & LOGO */
+    .hero{ padding: 25px 28px 10px; background: white; text-align: center; }
+    .logo{ width: 240px; height: auto; display: block; margin: 0 auto; }
+
+    /* ELEGANT CHECK-IN TAB */
+    .checkin-container {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0 20px;
+    }
+    .checkin-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 50px;
+        font-size: 0.8rem;
+        color: var(--muted);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .checkin-tag strong { color: var(--ecg-blue-dark); font-weight: 700; letter-spacing: 0.5px; }
+    .dot { height: 6px; width: 6px; background: var(--ecg-orange-light); border-radius: 50%; }
+
+    /* CONTROLS */
+    .controls{
+        padding: 20px 28px;
+        display: flex;
+        gap: 12px;
+        align-items: end;
+        flex-wrap: wrap;
+        background: #fbfcff;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .select-group{ flex: 1; min-width: 200px; }
+    .select-group label{
+        display: block;
+        margin-bottom: 6px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--muted);
+        letter-spacing: 1px;
+    }
+
+    #zoneSelect{
+        width: 100%;
+        padding: 12px 15px;
+        border-radius: 14px;
+        border: 1px solid #dbe2f1;
+        font-size: 0.9rem;
+        appearance: none;
+        background: white url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23304f9e' stroke-width='2'><polyline points='6 9 12 15 18 9'></polyline></svg>") no-repeat right 12px center;
+    }
+
+    /* GRADIENT BUTTONS */
+    .nav-btn{
+        height: 44px;
+        padding: 0 22px;
+        border: none;
+        border-radius: 14px;
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: 0.3s ease;
+    }
+
+    #navigateBtn {
+        background: linear-gradient(135deg, var(--ecg-blue-dark), var(--ecg-blue-light));
+        box-shadow: 0 4px 12px rgba(42, 68, 138, 0.15);
+    }
+
+    .checkout-btn {
+        background: linear-gradient(135deg, var(--ecg-orange-dark), var(--ecg-orange-light));
+        box-shadow: 0 4px 12px rgba(232, 155, 0, 0.15);
+    }
+
+    .nav-btn:hover{ opacity: 0.9; transform: translateY(-1px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+
+    /* MAP SECTION */
+    .map-section{ padding: 20px 28px; background: #fbfcff; position: relative; }
+    #map{ width: 100%; height: 350px; border-radius: 24px; border: 1px solid #dfe6f2; z-index: 1; }
+    
+    #nudgeOverlay {
+        position: absolute;
+        bottom: 35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        padding: 6px 6px 6px 16px;
+        border-radius: 50px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        display: none;
+        z-index: 1000;
+        align-items: center;
+        gap: 12px;
+        border: 1px solid var(--border);
+        animation: slideUp 0.4s ease-out;
+    }
+
+    @keyframes slideUp {
+        from { bottom: 10px; opacity: 0; }
+        to { bottom: 35px; opacity: 1; }
+    }
+
+    .nudge-text { font-size: 0.8rem; font-weight: 600; color: var(--ecg-blue-dark); }
+    
+    .nudge-btn {
+        background: linear-gradient(135deg, var(--ecg-orange-dark), var(--ecg-orange-light));
+        color: white;
+        border: none;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .bistro-icon-marker {
+        background: white;
+        border: 2px solid var(--ecg-orange-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        font-size: 14px;
+    }
+
+    /* BISTRO TILE */
+    .bistro-section{ padding: 30px 28px; background: white; border-top: 1px solid var(--border); }
+    .bistro-card{
+        max-width: 450px;
+        margin: auto;
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+    }
+    .bistro-card img{ width: 100%; height: 250px; object-fit: cover; display: block; }
+    
+    .bistro-label-overlay {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 2;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.7);
+        color: white;
+    }
+    .bistro-label-overlay h4 { font-size: 1.3rem; font-weight: 800; margin: 0; }
+    .bistro-label-overlay span { font-size: 0.85rem; font-weight: 600; color: #ffd15c; display: block; margin-top: 2px; }
+
+    .bistro-content{ padding: 20px; text-align: center; }
+    .tile-btn{ 
+        border: none; 
+        background: linear-gradient(135deg, var(--ecg-blue-dark), var(--ecg-blue-light)); 
+        color: white; 
+        padding: 12px 24px; 
+        border-radius: 14px; 
+        font-weight: 700; 
+        cursor: pointer; 
+        width: 100%; 
+        transition: 0.3s; 
+    }
+
+    @media(max-width: 680px){
+        .controls{ flex-direction: column; align-items: stretch; }
+        .nav-btn{ width: 100%; justify-content: center; }
+        #nudgeOverlay { width: 90%; justify-content: space-between; }
+    }
+</style>
+</head>
+
+<body>
+
+<div class="app-container">
+    <div class="hero">
+        <img src="ecg-logo.png" alt="ECGLANTERNA" class="logo">
+        
+        <div class="checkin-container">
+            <div class="checkin-tag">
+                <strong>CHECK-IN</strong> 10:00 — 20:00 <span class="dot"></span> After 20:00: Main Reception
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="select-group">
+            <label>LOCATION SELECTOR</label>
+            <select id="zoneSelect">
+                <option value="" disabled selected>Choose your camping zone...</option>
+            </select>
+        </div>
+        <button id="navigateBtn" class="nav-btn">🧭 Navigate</button>
+        <button onclick="window.location.href='checkout.html'" class="nav-btn checkout-btn">📋 Check-out</button>
+    </div>
+
+    <div class="map-section">
+        <div id="map"></div>
+        <div id="nudgeOverlay">
+            <span class="nudge-text">📍 <span id="distVal">...</span> walk to Bistro</span>
+            <button id="nudgeVisitBtn" class="nudge-btn">Visit Now</button>
+        </div>
+    </div>
+
+    <div class="bistro-section">
+        <div class="bistro-card">
+            <div class="bistro-label-overlay">
+                <h4>Bistro & Bakery Shop</h4>
+                <span id="dynamicGreeting">Mediterranean Flavors</span>
+            </div>
+            <img src="bistro.jpg" alt="Bistro">
+            <div class="bistro-content">
+                <button id="bistroNavBtn" class="tile-btn">Open in Google Maps</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const BISTRO_COORDS = [45.3031, 13.5936];
+
+    function updateBistroGreeting() {
+        const hour = new Date().getHours();
+        const greetingEl = document.getElementById('dynamicGreeting');
+        if (hour >= 7 && hour < 11) greetingEl.innerText = "🥐 Fresh croissants & bakery open!";
+        else if (hour >= 12 && hour < 16) greetingEl.innerText = "🥗 Mediterranean lunch special";
+        else if (hour >= 17 && hour < 22) greetingEl.innerText = "🍷 Sunset & wine at the Bistro";
+        else greetingEl.innerText = "Authentic Mediterranean Flavors";
+    }
+
+    function dmsToDec(s) {
+        const m = s.match(/(\d+)°(\d+)'([\d.]+)"([NSEW])/i);
+        if(!m) return null;
+        let d = parseInt(m[1]) + parseInt(m[2])/60 + parseFloat(m[3])/3600;
+        return (m[4].toUpperCase()==='S' || m[4].toUpperCase()==='W') ? -d : d;
+    }
+
+    const rawZones = [
+        { name: "B Zone Prestiz", dms: "45°17'42.7\"N 13°35'32.1\"E" },
+        { name: "B Zone Aria", dms: "45°17'43.3\"N 13°35'25.5\"E" },
+        { name: "C Zone", dms: "45°17'45.6\"N 13°35'31.5\"E" },
+        { name: "D Zone", dms: "45°17'48.3\"N 13°35'32.9\"E" },
+        { name: "L Zone (Standard)", dms: "45°18'19.3\"N 13°35'50.4\"E" },
+        { name: "I Zone (Sikara)", dms: "45°18'15.1\"N 13°35'38.3\"E" },
+        { name: "I Zone (Ex Sun Camp)", dms: "45°18'12.6\"N 13°35'31.6\"E" },
+        { name: "I Zone (Standard)", dms: "45°18'11.9\"N 13°35'40.2\"E" },
+        { name: "F Zone", dms: "45°18'13.2\"N 13°35'45.8\"E" },
+        { name: "J Zone", dms: "45°18'16.3\"N 13°35'44.8\"E" }
+    ];
+
+    const zones = rawZones.map((z, i) => {
+        const p = z.dms.split(/\s+/);
+        return { name: z.name, lat: dmsToDec(p[0]), lng: dmsToDec(p[1]) };
+    });
+
+    let map, zoneMarker, connectionLine;
+
+    function init() {
+        updateBistroGreeting();
+        
+        const select = document.getElementById('zoneSelect');
+        const nudgeOverlay = document.getElementById('nudgeOverlay');
+        const distVal = document.getElementById('distVal');
+
+        zones.forEach((z, i) => {
+            const opt = document.createElement('option');
+            opt.value = i; opt.textContent = z.name;
+            select.appendChild(opt);
+        });
+
+        map = L.map('map', {zoomControl: false}).setView(BISTRO_COORDS, 15);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+        const bistroIcon = L.divIcon({ html: '🍷', className: 'bistro-icon-marker', iconSize: [30, 30] });
+        L.marker(BISTRO_COORDS, {icon: bistroIcon}).addTo(map);
+        zoneMarker = L.marker(BISTRO_COORDS).addTo(map);
+
+        select.addEventListener('change', () => {
+            const z = zones[select.value];
+            const zCoords = [z.lat, z.lng];
+            zoneMarker.setLatLng(zCoords).bindPopup(`<b>${z.name}</b>`).openPopup();
+
+            if (connectionLine) connectionLine.setLatLngs([BISTRO_COORDS, zCoords]);
+            else connectionLine = L.polyline([BISTRO_COORDS, zCoords], {color: '#304f9e', weight: 2, dashArray: '5, 10', opacity: 0.5}).addTo(map);
+
+            const lat1 = BISTRO_COORDS[0], lon1 = BISTRO_COORDS[1];
+            const lat2 = z.lat, lon2 = z.lng;
+            const R = 6371;
+            const dLat = (lat2-lat1)*Math.PI/180;
+            const dLon = (lon2-lon1)*Math.PI/180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            const time = Math.round(((R * c) / 5) * 60);
+            
+            distVal.innerText = time + " min";
+            nudgeOverlay.style.display = "flex";
+            map.fitBounds(L.latLngBounds([BISTRO_COORDS, zCoords]), {padding: [70, 70]});
+        });
+
+        document.getElementById('navigateBtn').onclick = () => {
+            const z = zones[select.value];
+            if (!z) return alert("Please select a zone first.");
+            window.open(`https://www.google.com/maps/dir/?api=1&destination=${z.lat},${z.lng}&travelmode=driving`, '_blank');
+        };
+
+        const openBistroMap = () => {
+            window.open(`https://www.google.com/maps/dir/?api=1&destination=${BISTRO_COORDS[0]},${BISTRO_COORDS[1]}&travelmode=walking`, '_blank');
+        };
+
+        document.getElementById('bistroNavBtn').onclick = openBistroMap;
+        document.getElementById('nudgeVisitBtn').onclick = openBistroMap;
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECG Checkout</title>
+    <style>
+        :root {
+            --ecg-blue: #304f9e;
+            --ecg-orange: #e89b00;
+            --bg: #f7f8fc;
+            --text: #24324a;
+        }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        .lang-switcher { display: flex; gap: 8px; justify-content: center; margin-bottom: 25px; flex-wrap: wrap; }
+        .lang-btn { 
+            padding: 6px 14px; border: 1px solid #ddd; border-radius: 10px; cursor: pointer; 
+            background: white; font-weight: 600; font-size: 0.75rem; transition: 0.2s;
+        }
+        .lang-btn.active { background: var(--ecg-blue); color: white; border-color: var(--ecg-blue); }
+
+        h2 { color: var(--ecg-blue); margin-bottom: 10px; font-size: 1.5rem; text-align: center; }
+        .sub-head { font-size: 0.9rem; line-height: 1.5; color: #6b7280; margin-bottom: 20px; text-align: center; }
+        
+        .section { margin: 20px 0; padding: 18px; border-radius: 16px; background: #fff; border: 1px solid #eee; }
+        .section-title { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--ecg-blue); margin-bottom: 10px; font-size: 1.1rem; }
+        
+        .list-item { font-size: 0.9rem; line-height: 1.6; margin-bottom: 8px; padding-left: 20px; position: relative; }
+        .list-item::before { content: "•"; position: absolute; left: 5px; color: var(--ecg-orange); font-weight: bold; }
+        
+        .highlight-box { background: #fffcf5; border-left: 4px solid var(--ecg-orange); padding: 12px; margin: 10px 0; font-size: 0.85rem; border-radius: 0 8px 8px 0; }
+        .time-badge { background: var(--ecg-blue); color: white; padding: 2px 8px; border-radius: 4px; font-weight: 700; }
+
+        .back-btn { display: block; margin-top: 25px; color: var(--ecg-blue); text-decoration: none; font-weight: 600; font-size: 0.9rem; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="changeLang('en')">EN</button>
+        <button class="lang-btn" onclick="changeLang('de')">DE</button>
+        <button class="lang-btn" onclick="changeLang('it')">IT</button>
+        <button class="lang-btn" onclick="changeLang('fr')">FR</button>
+        <button class="lang-btn" onclick="changeLang('pl')">PL</button>
+    </div>
+
+    <h2 data-i18n="title">Check-Out Information</h2>
+    <p class="sub-head" data-i18n="subtitle">Please follow these steps before departure</p>
+
+    <div class="section">
+        <div class="section-title">📅 <span data-i18n="sec1_title">Before Departure</span></div>
+        <div class="list-item" data-i18n="sec1_item1">Send a WhatsApp message 1–2 days before departure.</div>
+        <div class="list-item" data-i18n="sec1_item2">Include your mobile home number and preferred check-out time.</div>
+        <div class="list-item">
+            <span data-i18n="sec1_item3">Check-out time is between</span> 
+            <span class="time-badge">7:00 AM – 10:00 AM</span>.
+        </div>
+        <div class="list-item" data-i18n="sec1_item4">A team member must inspect the house and collect the key.</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🧹 <span data-i18n="sec2_title">Basic Cleaning Required</span></div>
+        <div class="list-item" data-i18n="sec2_item1">Empty all trash bins</div>
+        <div class="list-item" data-i18n="sec2_item2">Wash and sort dishes</div>
+        <div class="list-item" data-i18n="sec2_item3">Remove bed linen</div>
+        <div class="list-item" data-i18n="sec2_item4">Sweep the floor</div>
+        <div class="list-item" data-i18n="sec2_item5">Clean the grill if used</div>
+        <div class="highlight-box" data-i18n="cleaning_note">Note: To avoid issues with the deposit, please complete the required basic cleaning before departure.</div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">🔑 <span data-i18n="sec3_title">If You Leave Early</span></div>
+        <div class="list-item" data-i18n="sec3_item1">Close all windows</div>
+        <div class="list-item" data-i18n="sec3_item2">Turn off the fridge and set it to “0”</div>
+        <div class="list-item" data-i18n="sec3_item3">Leave the key on the table inside the house</div>
+    </div>
+
+    <a href="index.html" class="back-btn">← <span data-i18n="back">Back to Map</span></a>
+</div>
+
+<script>
+    const translations = {
+        en: {
+            title: "Check-Out Information",
+            subtitle: "Please follow these steps before departure",
+            sec1_title: "Before Departure",
+            sec1_item1: "Send a WhatsApp message 1–2 days before departure.",
+            sec1_item2: "Include your mobile home number and preferred check-out time.",
+            sec1_item3: "Check-out time is between",
+            sec1_item4: "A team member must inspect the house and collect the key.",
+            sec2_title: "Basic Cleaning Required",
+            sec2_item1: "Empty all trash bins",
+            sec2_item2: "Wash and sort dishes",
+            sec2_item3: "Remove bed linen",
+            sec2_item4: "Sweep the floor",
+            sec2_item5: "Clean the grill if used",
+            cleaning_note: "Note: To avoid issues with the deposit, please complete the required basic cleaning before departure.",
+            sec3_title: "If You Leave Early",
+            sec3_item1: "Close all windows",
+            sec3_item2: "Turn off the fridge and set it to “0”",
+            sec3_item3: "Leave the key on the table inside the house",
+            back: "Back to Map"
+        },
+        de: {
+            title: "Check-Out Informationen",
+            subtitle: "Bitte befolgen Sie diese Schritte vor Ihrer Abreise",
+            sec1_title: "Vor der Abreise",
+            sec1_item1: "Senden Sie 1–2 Tage vor der Abreise eine WhatsApp-Nachricht.",
+            sec1_item2: "Geben Sie Ihre Mobilheimnummer und die gewünschte Check-out-Zeit an.",
+            sec1_item3: "Die Check-out-Zeit liegt zwischen",
+            sec1_item4: "Ein Mitarbeiter muss das Haus inspizieren und den Schlüssel abholen.",
+            sec2_title: "Grundreinigung erforderlich",
+            sec2_item1: "Alle Mülleimer leeren",
+            sec2_item2: "Geschirr spülen und einsortieren",
+            sec2_item3: "Bettwäsche abziehen",
+            sec2_item4: "Boden fegen",
+            sec2_item5: "Grill reinigen, falls benutzt",
+            cleaning_note: "Hinweis: Um Probleme mit der Kaution zu vermeiden, führen Sie bitte vor der Abreise die erforderliche Grundreinigung durch.",
+            sec3_title: "Bei vorzeitiger Abreise",
+            sec3_item1: "Alle Fenster schließen",
+            sec3_item2: "Kühlschrank ausschalten und auf „0“ stellen",
+            sec3_item3: "Lassen Sie den Schlüssel auf dem Tisch im Haus liegen",
+            back: "Zurück zur Karte"
+        },
+        it: {
+            title: "Informazioni per il Check-Out",
+            subtitle: "Si prega di seguire questi passaggi prima della partenza",
+            sec1_title: "Prima della Partenza",
+            sec1_item1: "Invia un messaggio WhatsApp 1–2 giorni prima della partenza.",
+            sec1_item2: "Indica il numero della casa mobile e l'orario di check-out preferito.",
+            sec1_item3: "L'orario di check-out è tra le",
+            sec1_item4: "Un membro del team deve ispezionare la casa e ritirare la chiave.",
+            sec2_title: "Pulizia di Base Richiesta",
+            sec2_item1: "Svuotare tutti i cestini dei rifiuti",
+            sec2_item2: "Lavare e riporre i piatti",
+            sec2_item3: "Rimuovere le lenzuola",
+            sec2_item4: "Spazzare il pavimento",
+            sec2_item5: "Pulire il grill se utilizzato",
+            cleaning_note: "Nota: per evitare problemi con il deposito, completare la pulizia di base richiesta prima della partenza.",
+            sec3_title: "In caso di Partenza Anticipata",
+            sec3_item1: "Chiudere tutte le finestre",
+            sec3_item2: "Spegnere il frigorifero e impostarlo su “0”",
+            sec3_item3: "Lasciare la chiave sul tavolo all'interno della casa",
+            back: "Torna alla Mappa"
+        },
+        fr: {
+            title: "Informations de Départ",
+            subtitle: "Veuillez suivre ces étapes avant votre départ",
+            sec1_title: "Avant le Départ",
+            sec1_item1: "Envoyez un message WhatsApp 1 à 2 jours avant le départ.",
+            sec1_item2: "Indiquez le numéro de votre mobil-home et l'heure de départ souhaitée.",
+            sec1_item3: "L'heure de départ est comprise entre",
+            sec1_item4: "Un membre de l'équipe doit inspecter la maison et récupérer la clé.",
+            sec2_title: "Nettoyage de Base Requis",
+            sec2_item1: "Vider toutes les poubelles",
+            sec2_item2: "Laver et ranger la vaisselle",
+            sec2_item3: "Retirer les draps de lit",
+            sec2_item4: "Balayer le sol",
+            sec2_item5: "Nettoyer le gril s'il a été utilisé",
+            cleaning_note: "Remarque : Pour éviter tout problème avec la caution, veuillez effectuer le nettoyage de base requis avant votre départ.",
+            sec3_title: "En cas de Départ Anticipé",
+            sec3_item1: "Fermer toutes les fenêtres",
+            sec3_item2: "Éteindre le réfrigérateur et le régler sur « 0 »",
+            sec3_item3: "Laissez la clé sur la table à l'intérieur de la maison",
+            back: "Retour à la Carte"
+        },
+        pl: {
+            title: "Informacja o Wymeldowaniu",
+            subtitle: "Przed wyjazdem prosimy o wykonanie poniższych kroków",
+            sec1_title: "Przed Wyjazdem",
+            sec1_item1: "Wyślij wiadomość WhatsApp 1–2 dni przed wyjazdem.",
+            sec1_item2: "Podaj numer domku i preferowaną godzinę wymeldowania.",
+            sec1_item3: "Czas wymeldowania to",
+            sec1_item4: "Pracownik musi sprawdzić domek i odebrać klucze.",
+            sec2_title: "Wymagane Podstawowe Sprzątanie",
+            sec2_item1: "Opróżnić wszystkie kosze na śmieci",
+            sec2_item2: "Umyć i schować naczynia",
+            sec2_item3: "Zdjąć pościel",
+            sec2_item4: "Zamieść podłogę",
+            sec2_item5: "Wyczyścić grill, jeśli był używany",
+            cleaning_note: "Uwaga: Aby uniknąć problemów z kaucją, prosimy o wykonanie podstawowego sprzątania przed wyjazdem.",
+            sec3_title: "W Przypadku Wczesnego Wyjazdu",
+            sec3_item1: "Zamknąć wszystkie okna",
+            sec3_item2: "Wyłączyć lodówkę i ustawić ją na „0”",
+            sec3_item3: "Zostaw klucze na stole wewnątrz domku",
+            back: "Powrót do Mapy"
+        }
+    };
+
+    function changeLang(lang) {
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            el.innerText = translations[lang][key];
+        });
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.innerText.toLowerCase() === lang) btn.classList.add('active');
+        });
+
+        localStorage.setItem('preferredLang', lang);
+    }
+
+    window.onload = () => {
+        const savedLang = localStorage.getItem('preferredLang') || 'en';
+        changeLang(savedLang);
+    };
+</script>
+
+</body>
+</html>
